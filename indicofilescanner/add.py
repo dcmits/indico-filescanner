@@ -15,12 +15,12 @@ def do_add():
             try:
                 import pyclamd
                 pyclamd.ClamdAgnostic()
-                Logger.get('FileScanner').info("ClamAV daemon found.")
+                Logger.get('FileScanner').error("ClamAV daemon found.")
             except ValueError as e:
-                Logger.get('FileScanner').warning(e)
+                Logger.get('FileScanner').critical(e)
                 self._errorList.append("File upload FAILED: Unable to check for Viruses: %s" % (e))
             except:
-                Logger.get('FileScanner').warning("Unable to import pyclamd. No files will be scanned.")
+                Logger.get('FileScanner').critical("Unable to import pyclamd. No files will be scanned.")
                 self._errorList.append("File upload FAILED: Unable to check for Viruses.")
             else:
                 # If no other errors has been found, check for viruses
@@ -31,7 +31,9 @@ def do_add():
                         # Virus found
                         virus_desc = str(av_result[fileEntry["filePath"]][1])
                         self._errorList.append("Virus found: " + virus_desc)
-                        Logger.get('FileScanner').warning("Virus Found: %s" % (virus_desc))
+                        Logger.get('FileScanner').critical("Virus Found: %s" % (virus_desc))
+                    else:
+                        Logger.get('FileScanner').info("File %s scanned, no Virus found" % (fileEntry["filePath"]))
         return new_funct
 
     RHSubmitMaterialBase._setErrorList = monkey_setErrorList(RHSubmitMaterialBase._setErrorList)
